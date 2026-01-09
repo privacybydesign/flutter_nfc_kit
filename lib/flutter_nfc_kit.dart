@@ -337,6 +337,7 @@ class FlutterNfcKit {
     bool readIso18092 = false,
     bool readIso15693 = true,
     bool probeWebUSBMagic = false,
+    Duration? extraReaderPresenceCheckDelay,
   }) async {
     // use a bitmask for compact representation
     int technologies = 0x0;
@@ -354,6 +355,9 @@ class FlutterNfcKit {
       'iosMultipleTagMessage': iosMultipleTagMessage,
       'technologies': technologies,
       'probeWebUSBMagic': probeWebUSBMagic,
+      if (extraReaderPresenceCheckDelay != null)
+        "extra_reader_presence_check_delay":
+            extraReaderPresenceCheckDelay.inMilliseconds,
     });
     return NFCTag.fromJson(jsonDecode(data));
   }
