@@ -203,3 +203,8 @@
 * Add more detailed error message in iOS APIs
 * Bump tools to Gradle 9.2.1, AGP 8.13.0, Kotlin 2.2.21
   * Now `minSdkVersion` is lowered to 24 (#212)
+
+## 3.6.2
+
+* New `androidReaderModeFlags` parameter for `poll()` method to customize Android Reader Mode behavior (#225)
+* Add option to specify `EXTRA_READER_PRESENCE_CHECK_DELAY` on Android (#228)

@@ -330,10 +330,10 @@ class FlutterNfcKitPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 val timeout = call.argument<Int>("timeout")!!
                 // technology and option bits are set in Dart code
                 val technologies = call.argument<Int>("technologies")!!
+                val readerModeFlags = call.argument<Int>("readerModeFlags")
                 val extraPresenceDelay = call.argument<Int>("extra_reader_presence_check_delay")
-
                 runOnNfcThread(result, "Poll") {
-                    pollTag(nfcAdapter, result, timeout, technologies, extraPresenceDelay)
+                    pollTag(nfcAdapter, result, timeout, technologies, readerModeFlags, extraPresenceDelay)
                 }
             }
 
@@ -586,7 +586,7 @@ class FlutterNfcKitPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
 
     override fun onDetachedFromActivityForConfigChanges() {}
 
-    private fun pollTag(nfcAdapter: NfcAdapter, result: Result, timeout: Int, technologies: Int, extraReaderPresenceCheckDelay: Int?) {
+    private fun pollTag(nfcAdapter: NfcAdapter, result: Result, timeout: Int, technologies: Int, readerModeFlags: Int?, extraReaderPresenceCheckDelay: Int?) {
         pollingTimeoutTask = Timer().schedule(timeout.toLong()) {
             try {
                 if (activity.get() != null) {
@@ -606,11 +606,19 @@ class FlutterNfcKitPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             result.success(jsonResult)
         }
 
+        // Build final flags: combine technology flags with optional reader mode flags
+        val finalFlags = if (readerModeFlags != null) {
+            technologies or readerModeFlags
+        } else {
+            technologies
+        }
+
         val options = Bundle()
         if (extraReaderPresenceCheckDelay != null) {
             options.putInt(EXTRA_READER_PRESENCE_CHECK_DELAY, extraReaderPresenceCheckDelay)
         }
-        nfcAdapter.enableReaderMode(activity.get(), pollHandler, technologies, options)
+
+        nfcAdapter.enableReaderMode(activity.get(), pollHandler, finalFlags, options)
     }
 
     private class MethodResultWrapper(result: Result) : Result {

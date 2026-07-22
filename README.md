@@ -72,3 +72,26 @@ We use error codes with similar meaning as HTTP status code. Brief explanation a
 ### Operation Mode
 
 We provide two operation modes: polling (default) and event streaming. Both can give the same `NFCTag` object. Please see [example](example/example.md) for more details.
+
+### Performance Optimization (Android)
+
+For Android applications, you can optimize NFC tag detection performance using the `androidReaderModeFlags` parameter:
+
+```dart
+// Skip automatic NDEF discovery for ~500ms faster detection
+// and disable platform sounds for custom feedback
+const flags = 0x80 | 0x100; // FLAG_READER_SKIP_NDEF_CHECK | FLAG_READER_NO_PLATFORM_SOUNDS
+
+final tag = await FlutterNfcKit.poll(
+  androidReaderModeFlags: flags,
+);
+```
+
+Common flags from [`NfcAdapter`](https://developer.android.com/reference/android/nfc/NfcAdapter#enableReaderMode(android.app.Activity,%20android.nfc.NfcAdapter.ReaderCallback,%20int,%20android.os.Bundle)):
+- `0x80` - `FLAG_READER_SKIP_NDEF_CHECK`: Skip automatic NDEF discovery, improving detection speed by ~500ms
+- `0x100` - `FLAG_READER_NO_PLATFORM_SOUNDS`: Disable system beep/vibration for custom audio/haptic feedback
+
+These flags are particularly useful for applications that:
+- Need fast tag detection (e.g., access control, fast payments)
+- Implement custom user feedback instead of system sounds
+- Use custom NDEF reading logic instead of automatic discovery
